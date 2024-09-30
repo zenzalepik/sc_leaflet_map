@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet Get Coordinates Example</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+        #locateButton {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #locateButton:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <button id="locateButton">Pusatkan Lokasi Saya</button>
+    <div id="map"></div>
+    <p id="coordinates"></p> <!-- Tempat menampilkan koordinat -->
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Inisialisasi peta
+        var map = L.map('map').setView([-6.200000, 106.816666], 13); // Jakarta
+
+        // Tambahkan layer OpenStreetMap ke peta
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Event untuk mendapatkan koordinat saat klik di peta
+        map.on('click', function(e) {
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+
+            // Tampilkan koordinat
+            document.getElementById('coordinates').innerHTML = `Koordinat: ${lat}, ${lng}`;
+
+            // Tambahkan marker pada lokasi klik
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup(`Koordinat: ${lat}, ${lng}`).openPopup();
+        });
+
+        // Fungsi untuk memusatkan peta ke lokasi pengguna
+        document.getElementById('locateButton').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+
+                    // Set view peta ke lokasi pengguna
+                    map.setView([lat, lng], 13);
+
+                    // Tambahkan marker di lokasi pengguna
+                    L.marker([lat, lng]).addTo(map)
+                        .bindPopup(`Lokasi Anda: ${lat}, ${lng}`).openPopup();
+
+                    // Tampilkan koordinat
+                    document.getElementById('coordinates').innerHTML = `Koordinat Anda: ${lat}, ${lng}`;
+                }, function() {
+                    alert("Tidak dapat mengakses lokasi Anda.");
+                });
+            } else {
+                alert("Geolocation tidak didukung oleh browser ini.");
+            }
+        });
+    </script>
+</body>
+</html>
